@@ -19,7 +19,6 @@ import java.util.*
 
 class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
 
-
     fun specialAttackEvent(event: EntityShootBowEvent) {
 
         val projectiles: MutableList<Projectile> = mutableListOf()
@@ -73,6 +72,10 @@ class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
             "sky" -> {
 
                 lightningSpectralArrowEvent(event)
+                val levitatingArrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
+                levitatingArrow.addCustomEffect(PotionEffect(PotionEffectType.LEVITATION, 2, 10), true)
+
+                projectiles.add(levitatingArrow)
 
             }
             "end" -> projectiles.add(entity.launchProjectile(DragonFireball::class.java, event.projectile.velocity))
@@ -101,8 +104,6 @@ class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
         val entity = event.entity
 
         if (entity !is Player) return
-
-        val playerUUID = entity.uniqueId
 
         val bow = event.bow ?: return
 

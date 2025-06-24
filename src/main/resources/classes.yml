@@ -1,0 +1,7 @@
+classes:
+  - overworld
+  - nether
+  - ocean
+  - sky
+  - end
+  - wither

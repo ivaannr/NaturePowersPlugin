@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NaturePowers:jar">
+    <output-path>$PROJECT_DIR$/../../../../../../Nueva carpeta/plugins/</output-path>
+    <root id="archive" name="NaturePowers.jar">
+      <element id="module-output" name="NaturePowers" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/2.2.0/kotlin-stdlib-2.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk7/2.2.0/kotlin-stdlib-jdk7-2.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/26.0.2/annotations-26.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk8/2.2.0/kotlin-stdlib-jdk8-2.2.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
