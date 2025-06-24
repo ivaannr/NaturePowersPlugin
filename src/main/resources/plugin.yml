@@ -1,0 +1,4 @@
+name: NaturePowers
+version: '1.0-SNAPSHOT'
+main: me.ivan.naturePowers.NaturePowers
+api-version: '1.21'
