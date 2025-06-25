@@ -59,6 +59,10 @@ class NaturePowers : JavaPlugin() {
 
         server.pluginManager.registerEvents(SpecialSkillListener(), this)
 
+        //server.pluginManager.registerEvents(DebugShootListener(this), this)
+
+        //server.pluginManager.registerEvents(TestProjectileListener(this), this)
+
         logger.info("Listeners registered!")
 
     }

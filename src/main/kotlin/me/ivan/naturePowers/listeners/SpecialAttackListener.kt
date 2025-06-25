@@ -5,100 +5,122 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.*;
+import org.bukkit.entity.*
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
 
 class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
 
+
+    @EventHandler
     fun specialAttackEvent(event: EntityShootBowEvent) {
 
-        val projectiles: MutableList<Projectile> = mutableListOf()
-        projectiles.clear()
-
         val entity = event.entity
-
         if (entity !is Player) return
-
-        val playerUUID = entity.uniqueId
-
-        val bow = event.bow ?: return
-
-        if (!bow.hasItemMeta()) return
 
         event.isCancelled = true
 
-        when (NaturePowers.manager.getPlayerClass(playerUUID
-            .toString()).toString().lowercase(Locale.getDefault())) {
+        val playerClass = NaturePowers.manager.getPlayerClass(entity.uniqueId.toString())?.lowercase(Locale.getDefault())
+            ?: return
+
+        plugin.logger.info("EntityShootBowEvent triggered by ${entity.name}")
+        plugin.logger.info("Player class for ${entity.name}: $playerClass")
+
+        val direction = entity.location.direction.normalize().multiply(12.0)
+        val notArrowDirection = entity.location.direction.normalize()
+
+        when (playerClass) {
 
             "nether" -> {
 
-                projectiles.add(entity.launchProjectile(Fireball::class.java, event.projectile.velocity))
-                projectiles.add(entity.launchProjectile(SmallFireball::class.java, event.projectile.velocity))
-                projectiles.add(entity.launchProjectile(Firework::class.java, event.projectile.velocity))
+                val fireball = entity.launchProjectile(Fireball::class.java, notArrowDirection)
+                fireball.shooter = entity
+
+                object : BukkitRunnable() {
+                    override fun run() {
+                        val smallFireball = entity.launchProjectile(SmallFireball::class.java, notArrowDirection)
+                        smallFireball.shooter = entity
+                    }
+                }.runTaskLater(plugin, 1L)
+
+                object : BukkitRunnable() {
+                    override fun run() {
+                        val firework = entity.launchProjectile(Firework::class.java, notArrowDirection)
+                        firework.shooter = entity
+                    }
+                }.runTaskLater(plugin, 2L)
 
             }
             "ocean" -> {
 
-                val arrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
-                arrow.addCustomEffect(PotionEffect(PotionEffectType.POISON, 15, 2), true)
-
-                val trident: Trident = entity.launchProjectile(Trident::class.java, event.projectile.velocity)
+                val arrow = entity.world.spawnArrow(entity.eyeLocation, direction, 1.0f, 12.0f)
+                arrow.addCustomEffect(PotionEffect(PotionEffectType.POISON, 10 * 20, 2), true)
+                val trident = entity.launchProjectile(Trident::class.java, notArrowDirection.multiply(2.0))
                 trident.isGlowing = true
 
-                projectiles.add(arrow)
-                projectiles.add(trident)
+                arrow.shooter = entity
+
+                val key = NamespacedKey(plugin, "bow_shot_trident")
+                trident.persistentDataContainer.set(key, PersistentDataType.INTEGER, 1)
+
+                trident.shooter = entity
 
             }
             "overworld" -> {
 
-                val damageArrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
-                damageArrow.addCustomEffect(PotionEffect(PotionEffectType.INSTANT_DAMAGE, 7, 1), true)
-                val slownessArrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
-                slownessArrow.addCustomEffect(PotionEffect(PotionEffectType.SLOWNESS, 3, 10), true)
+                val damageArrow = entity.world.spawnArrow(entity.eyeLocation, direction, 1.0f, 12.0f)
+                damageArrow.addCustomEffect(PotionEffect(PotionEffectType.INSTANT_DAMAGE, 7 * 20, 1), true)
+                val slownessArrow = entity.world.spawnArrow(entity.eyeLocation, direction, 1.0f, 12.0f)
+                slownessArrow.addCustomEffect(PotionEffect(PotionEffectType.SLOWNESS, 3 * 20, 255), true)
 
-                projectiles.add(damageArrow)
-                projectiles.add(slownessArrow)
+                damageArrow.shooter = entity
+                slownessArrow.shooter = entity
 
             }
             "sky" -> {
 
-                lightningSpectralArrowEvent(event)
-                val levitatingArrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
-                levitatingArrow.addCustomEffect(PotionEffect(PotionEffectType.LEVITATION, 2, 10), true)
+                val levitatingArrow = entity.world.spawnArrow(entity.eyeLocation, direction, 1.0f, 12.0f)
+                levitatingArrow.addCustomEffect(PotionEffect(PotionEffectType.LEVITATION, 2 * 20, 30), true)
 
-                projectiles.add(levitatingArrow)
+                val key = NamespacedKey(plugin, "lightningSpecialArrow")
+                levitatingArrow.persistentDataContainer.set(key, PersistentDataType.INTEGER, 1)
 
+                levitatingArrow.shooter = entity
             }
-            "end" -> projectiles.add(entity.launchProjectile(DragonFireball::class.java, event.projectile.velocity))
+            "end" -> {
+
+                val dragonFireball = entity.launchProjectile(DragonFireball::class.java, notArrowDirection)
+                dragonFireball.shooter = entity
+            }
 
             "wither" -> {
 
-                val witherSkull = entity.launchProjectile(WitherSkull::class.java, event.projectile.velocity)
+                val witherSkull = entity.launchProjectile(WitherSkull::class.java, notArrowDirection.multiply(4.0))
                 witherSkull.isGlowing = true
                 witherSkull.isCharged = true
-                val witherArrow = entity.launchProjectile(TippedArrow::class.java, event.projectile.velocity)
-                witherArrow.addCustomEffect(PotionEffect(PotionEffectType.WITHER, 7, 1), true)
+                val witherArrow = entity.world.spawnArrow(entity.eyeLocation, direction, 1.0f, 12.0f)
+                witherArrow.addCustomEffect(PotionEffect(PotionEffectType.WITHER, 7 * 20, 1), true)
 
-                projectiles.add(witherArrow)
-                projectiles.add(witherSkull)
+                witherSkull.shooter = entity
+                witherArrow.shooter = entity
 
             }
 
         }
-
-        projectiles.forEach { it.shooter = entity }
-
     }
 
+
+    //Unused
     private fun lightningSpectralArrowEvent(event: EntityShootBowEvent) {
 
         val entity = event.entity
@@ -109,12 +131,10 @@ class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
 
         if (!bow.hasItemMeta()) return
 
-        event.isCancelled = true
-
         val arrow = event.projectile
         if (arrow is Arrow) {
             arrow.persistentDataContainer.set(
-                NamespacedKey(plugin, "lightningSpectralArrow"),
+                NamespacedKey(plugin, "lightningSpecialArrow"),
                 PersistentDataType.INTEGER,
                 1
             )
@@ -124,12 +144,13 @@ class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
     }
 
 
+    @EventHandler
     fun onArrowHit(event: EntityDamageByEntityEvent) {
 
         val damager = event.damager
         val target = event.entity
 
-        if (damager is Arrow && target is Player) {
+        if (damager is AbstractArrow && target is Player) {
 
             val shooter = damager.shooter
             if (shooter is Player) {
@@ -153,6 +174,23 @@ class SpecialAttackListener(private val plugin: JavaPlugin): Listener {
 
             }
         }
+    }
+
+    @EventHandler
+    fun onTridentHitEvent(event: ProjectileHitEvent) {
+
+        val projectile = event.entity
+
+        if (projectile is Trident) {
+
+            val key = NamespacedKey(plugin, "bow_shot_trident")
+            val isCustom = projectile.persistentDataContainer.get(key, PersistentDataType.INTEGER)
+
+            if (isCustom == 1) {
+                projectile.remove()
+            }
+        }
+
     }
 
 

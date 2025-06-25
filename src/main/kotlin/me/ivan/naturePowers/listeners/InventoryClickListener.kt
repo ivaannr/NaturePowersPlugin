@@ -14,13 +14,8 @@ class InventoryClickListener: Listener {
     @EventHandler
     fun inventoryClassSelectorClickEvent(event: InventoryClickEvent) {
 
-        val player = event.whoClicked
+        val player = event.whoClicked as? Player ?: return
         val playerUUID = player.uniqueId
-
-//        if (event.view.title != "Select your class!") return
-//        val classGui = NaturePowers.selectClassGUIMap[playerUUID] ?: return
-//        if (event.clickedInventory != classGui) return
-//        val selectedItem = event.currentItem ?: return
 
         if (event.inventory == NaturePowers.selectClassGUIMap[playerUUID]) {
 

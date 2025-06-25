@@ -31,6 +31,7 @@ class SpecialSkillListener: Listener {
                     "nether" -> SmallFireball::class.java
                     "ocean" -> Trident::class.java
                     "sky" -> SpectralArrow::class.java
+                    "overworld" -> Egg::class.java
                     else -> null
                 }
 
