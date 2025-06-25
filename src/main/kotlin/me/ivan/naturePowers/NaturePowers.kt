@@ -47,6 +47,8 @@ class NaturePowers : JavaPlugin() {
 
         server.pluginManager.registerEvents(InventoryCloseListener(), this)
 
+        server.pluginManager.registerEvents(SpecialSkillListener(), this)
+
         logger.info("Listeners registered!")
 
     }
