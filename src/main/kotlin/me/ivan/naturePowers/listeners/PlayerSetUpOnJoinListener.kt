@@ -33,6 +33,7 @@ class PlayerSetUpOnJoinListener: Listener {
             return
         }
 
+        NaturePowers.manager.setPlayerClass(player.uniqueId.toString(), "none")
         setPlayerStats(player)
     }
 

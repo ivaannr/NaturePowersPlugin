@@ -25,8 +25,6 @@ class NaturePowers : JavaPlugin() {
     override fun onEnable() {
         // Plugin startup logic
 
-
-
         logger.info("Starting Nature Powers...")
 
         instance = this

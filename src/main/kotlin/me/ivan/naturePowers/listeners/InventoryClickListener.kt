@@ -10,41 +10,41 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 
 class InventoryClickListener: Listener {
-    
+
     @EventHandler
     fun inventoryClassSelectorClickEvent(event: InventoryClickEvent) {
 
-        val player = event.whoClicked as? Player ?: return
+        val player = event.whoClicked
         val playerUUID = player.uniqueId
 
-        if (event.view.title != "Select your class!") return
+//        if (event.view.title != "Select your class!") return
+//        val classGui = NaturePowers.selectClassGUIMap[playerUUID] ?: return
+//        if (event.clickedInventory != classGui) return
+//        val selectedItem = event.currentItem ?: return
 
-        val classGui = NaturePowers.selectClassGUIMap[playerUUID] ?: return
+        if (event.inventory == NaturePowers.selectClassGUIMap[playerUUID]) {
 
-        if (event.clickedInventory != classGui) return
+            val playerClass = when (event.currentItem?.type) {
+                Material.BLAZE_POWDER -> "nether"
+                Material.HEART_OF_THE_SEA -> "ocean"
+                Material.GRASS_BLOCK -> "overworld"
+                Material.FEATHER -> "sky"
+                Material.ENDER_EYE -> "end"
+                Material.WITHER_SKELETON_SKULL -> "wither"
+                else -> return
+            }
 
-        event.isCancelled = true
+            NaturePowers.manager.setPlayerClass(playerUUID.toString(), playerClass)
 
-        val selectedItem = event.currentItem ?: return
+            player.sendMessage(
+                Component
+                    .text("Has elegido la clase: $playerClass")
+                    .color(TextColor.color(0, 255, 0))
+            )
 
-        val playerClass = when (selectedItem.type) {
-            Material.BLAZE_POWDER -> "nether"
-            Material.HEART_OF_THE_SEA -> "ocean"
-            Material.GRASS_BLOCK -> "overworld"
-            Material.FEATHER -> "sky"
-            Material.ENDER_EYE -> "end"
-            Material.WITHER_SKELETON_SKULL -> "wither"
-            else -> return
+            event.inventory.close()
+            event.isCancelled = true
         }
-
-        NaturePowers.manager.setPlayerClass(playerUUID.toString(), playerClass)
-
-        player.sendMessage(Component
-            .text("Has elegido la clase: $playerClass")
-            .color(TextColor.color(0, 255, 0)))
-
-
-        player.closeInventory()
     }
 
 }
