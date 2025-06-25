@@ -1,0 +1,13 @@
+classes:
+  - nether:
+      item: "BLAZER_POWDER"
+  - ocean:
+      item: "HEART_OF_THE_SEA"
+  - overworld:
+      item: "GRASS_BLOCK"
+  - sky:
+      item: "FEATHER"
+  - end:
+      item: "ENDER_EYE"
+  - wither:
+      item: "WITHER_SKELETON_SKULL"

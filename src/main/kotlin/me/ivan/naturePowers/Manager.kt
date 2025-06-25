@@ -29,12 +29,14 @@ class Manager: JavaPlugin() {
         logger.info("Classes loaded successfully")
     }
 
-    fun getPlayerClass(UUID: String): String? = classConfig.getString("$UUID.playerClass")
+    fun getPlayerClass(UUID: String): String? = classConfig.getString("$UUID.playerClass") ?: null
 
     fun setPlayerClass(UUID: String, playerClass: String) {
         classConfig.set(UUID, playerClass)
         classConfig.save(classFile)
     }
+
+    fun getClases(): List<String> = classConfig.getStringList("classes")
 
 
 

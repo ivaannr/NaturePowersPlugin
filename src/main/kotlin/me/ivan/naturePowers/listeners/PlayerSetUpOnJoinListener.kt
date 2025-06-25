@@ -1,21 +1,47 @@
 package me.ivan.naturePowers.listeners
 
 import me.ivan.naturePowers.NaturePowers
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
+import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.scheduler.BukkitRunnable
 
-class PlayerSetUpOnJoinListener {
+class PlayerSetUpOnJoinListener: Listener {
 
 
-    fun setPlayerStatsEvent(event: PlayerJoinEvent) {
+    fun onPlayerJoinEvent (event: PlayerJoinEvent) {
 
         val player = event.player
+        val playerClass: String? = NaturePowers.manager.getPlayerClass(player.uniqueId.toString())
+        val classesList = NaturePowers.manager.getClases()
+
+        if (!classesList.contains(playerClass)) {
+
+            player.sendMessage(
+                Component.text("You must select a class!")
+                    .color(TextColor.color(255, 0, 0))
+                    .decorate(TextDecoration.BOLD))
+
+            player.sendMessage(
+                Component.text("Type '/chooseClass' in order to select a class.")
+                    .color(TextColor.color(255, 0, 0))
+                    .decorate(TextDecoration.BOLD))
+
+            return
+        }
+
+        setPlayerStats(player)
+    }
 
 
+    private fun setPlayerStats(player: Player) {
 
-        when (NaturePowers.manager.getPlayerClass(player.uniqueId.toString())) {
+        val playerClass: String? = NaturePowers.manager.getPlayerClass(player.uniqueId.toString())
 
+        when (playerClass) {
 
             "nether" -> {
                 player.fireTicks = 0
@@ -24,14 +50,16 @@ class PlayerSetUpOnJoinListener {
                 //Can breathe underwater
             }
             "overworld" -> {
-                player.walkSpeed = 0.15f
+                player.isHealthScaled = true
                 player.healthScale = 40.0
                 player.health = 40.0
+                player.walkSpeed = 0.15f
             }
             "sky" -> {
-                player.walkSpeed = 0.25f
+                player.isHealthScaled = true
                 player.healthScale = 18.0
                 player.health = 18.0
+                player.walkSpeed = 0.25f
                 //Has no fall damage
             }
             "end" -> {
@@ -48,14 +76,7 @@ class PlayerSetUpOnJoinListener {
 
         }
 
-
-
-
-
-
     }
-
-
 
 
 }

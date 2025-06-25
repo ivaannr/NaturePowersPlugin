@@ -1,4 +1,15 @@
 package me.ivan.naturePowers.listeners
 
-class SpecialSkillListener {
+import org.bukkit.event.Listener
+
+class SpecialSkillListener: Listener {
+
+    fun OceanSpecialSkillEvent() {
+
+
+
+
+    }
+
+
 }
