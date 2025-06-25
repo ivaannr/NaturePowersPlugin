@@ -10,7 +10,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 
 class InventoryClickListener: Listener {
-
+    
     @EventHandler
     fun inventoryClassSelectorClickEvent(event: InventoryClickEvent) {
 
@@ -20,7 +20,10 @@ class InventoryClickListener: Listener {
         if (event.view.title != "Select your class!") return
 
         val classGui = NaturePowers.selectClassGUIMap[playerUUID] ?: return
+
         if (event.clickedInventory != classGui) return
+
+        event.isCancelled = true
 
         val selectedItem = event.currentItem ?: return
 
@@ -34,15 +37,14 @@ class InventoryClickListener: Listener {
             else -> return
         }
 
-        NaturePowers.manager.setPlayerClass(playerUUID.toString(), playerClass.toString())
+        NaturePowers.manager.setPlayerClass(playerUUID.toString(), playerClass)
 
         player.sendMessage(Component
             .text("Has elegido la clase: $playerClass")
             .color(TextColor.color(0, 255, 0)))
 
-        event.inventory.close()
-        event.isCancelled = true
 
+        player.closeInventory()
     }
 
 }

@@ -11,22 +11,34 @@ import java.util.*
 
 class NaturePowers : JavaPlugin() {
 
+
+
     companion object {
-        val manager = Manager()
+        lateinit var instance: NaturePowers
+            private set
+
+        lateinit var manager: Manager
+        
         val selectClassGUIMap: MutableMap<UUID, Inventory> = mutableMapOf()
     }
 
     override fun onEnable() {
         // Plugin startup logic
 
+
+
         logger.info("Starting Nature Powers...")
+
+        instance = this
+        manager = Manager(this)
+        manager.loadClasses()
 
         UnderWaterBreathingTask().runTaskTimer(this, 0L, 20L)
 
         registerListener()
         registerCommands()
 
-        manager.loadClasses()
+
 
     }
 
@@ -56,7 +68,7 @@ class NaturePowers : JavaPlugin() {
     @EventHandler
     private fun registerCommands() {
 
-        getCommand("openGUI")?.setExecutor(OpenSelectClassGUICommand())
+        getCommand("chooseClass")?.setExecutor(OpenSelectClassGUICommand())
 
         logger.info("Commands registered!")
     }
