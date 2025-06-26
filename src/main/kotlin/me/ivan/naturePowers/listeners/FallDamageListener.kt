@@ -17,12 +17,15 @@ class FallDamageListener: Listener {
             event.cause == EntityDamageEvent.DamageCause.FALL
             )) {
 
-            if (NaturePowers.manager.getPlayerClass(entity.uniqueId.toString()) == "sky") {
-                event.isCancelled = true
+            val clazz = NaturePowers.manager.getPlayerClass(entity.uniqueId.toString())
+
+            when (clazz) {
+
+                "sky" -> event.isCancelled = true
+                "overworld" -> event.damage /= 2
+
             }
-            else if (NaturePowers.manager.getPlayerClass(entity.uniqueId.toString()) == "overworld") {
-                event.damage /= 2
-            }
+
         }
     }
 

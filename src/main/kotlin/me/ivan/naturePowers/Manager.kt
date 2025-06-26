@@ -1,11 +1,6 @@
 package me.ivan.naturePowers
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
-import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.IOException
@@ -13,10 +8,10 @@ import java.io.IOException
 class Manager(private val plugin: JavaPlugin) {
 
     private lateinit var classFile: File
-    private lateinit var classConfig: FileConfiguration
+    private lateinit var classConfig: YamlConfiguration
 
     fun loadClasses() {
-        classFile = File(plugin.dataFolder, "classes.yml")
+        classFile = File(plugin.dataFolder, "playerData.yml")
 
         try {
             if (!classFile.exists()) {
@@ -25,38 +20,78 @@ class Manager(private val plugin: JavaPlugin) {
             }
             classConfig = YamlConfiguration.loadConfiguration(classFile)
         } catch (e: IOException) {
-            plugin.logger.severe("It wasn't possible to load or create the file classes.yml")
+            plugin.logger.severe("It wasn't possible to load or create the file playerData.yml")
             e.printStackTrace()
         }
 
         plugin.logger.info("Classes loaded successfully")
     }
 
-    fun getPlayerClass(UUID: String): String? = classConfig.getString("$UUID.playerClass")
+    fun getPlayerClass(UUID: String): String? =
+        classConfig.getString("$UUID.playerClass")
 
     fun setPlayerClass(UUID: String, playerClass: String) {
         classConfig.set("$UUID.playerClass", playerClass)
-        classConfig.save(classFile)
+
+        val uuidList = classConfig.getStringList("UUID")
+        if (!uuidList.contains(UUID)) {
+            uuidList.add(UUID)
+            classConfig.set("UUID", uuidList)
+        }
+
+        try {
+            classConfig.save(classFile)
+        } catch (e: IOException) {
+            plugin.logger.severe("Could not save player class for $UUID")
+            e.printStackTrace()
+        }
     }
 
     fun getClases(): List<String> = classConfig.getStringList("classes")
 
-    private fun getPlayersUUIDs(): List<String> = classConfig.getStringList("UUID")
+    /**
+     * For debugging purposes
+     */
+    fun debugLogAllPlayerClasses() {
+        for (uuid in classConfig.getKeys(false)) {
+            val section = classConfig.getConfigurationSection(uuid)
+            val playerClass = section?.getString("playerClass")
 
-    fun playerHasSelectedClass(sender: Player): Boolean {
-        val uuid = sender.uniqueId.toString()
-
-        if (NaturePowers.manager.getPlayersUUIDs().contains(uuid)) {
-            sender.sendMessage(
-                Component.text("You have already selected your class!")
-                    .color(TextColor.color(20, 50, 50))
-            )
-            return true
+            if (playerClass != null) {
+                plugin.logger.info("UUID: $uuid | Clase: $playerClass")
+            } else {
+                plugin.logger.warning("UUID: $uuid no tiene clase asignada.")
+            }
         }
-
-        return false
     }
 
+    fun playerHasClass(uuid: String): Boolean {
+        return classConfig.contains("$uuid.playerClass") && !classConfig.getString("$uuid.playerClass").isNullOrEmpty()
+    }
 
+    fun cleanPlayerData() {
+        val keysToRemove = mutableListOf<String>()
 
+        for (key in classConfig.getKeys(false)) {
+            val section = classConfig.getConfigurationSection(key)
+            val playerClass = section?.getString("playerClass")
+
+            if (playerClass.isNullOrEmpty()) {
+                keysToRemove.add(key)
+            }
+        }
+
+        for (key in keysToRemove) {
+            classConfig.set(key, null)
+            plugin.logger.info("Invalid key: $key")
+        }
+
+        try {
+            classConfig.save(classFile)
+            plugin.logger.info("File: playerData.yml cleaned and saved successfully")
+        } catch (e: IOException) {
+            plugin.logger.severe("Error, saving playerData.yml after cleaning")
+            e.printStackTrace()
+        }
+    }
 }

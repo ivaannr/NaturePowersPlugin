@@ -16,6 +16,7 @@ class InventoryClickListener: Listener {
 
         val player = event.whoClicked as? Player ?: return
         val playerUUID = player.uniqueId
+        
 
         if (event.inventory == NaturePowers.selectClassGUIMap[playerUUID]) {
 
@@ -26,6 +27,7 @@ class InventoryClickListener: Listener {
                 Material.FEATHER -> "sky"
                 Material.ENDER_EYE -> "end"
                 Material.WITHER_SKELETON_SKULL -> "wither"
+                Material.BARRIER -> "close"
                 else -> return
             }
 

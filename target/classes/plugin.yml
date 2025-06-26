@@ -1,7 +1,7 @@
 name: NaturePowers
-version: '1.0-SNAPSHOT'
+version: '2.0-SNAPSHOT'
 main: me.ivan.naturePowers.NaturePowers
-api-version: '1.21'
+api-version: '1.21.4'
 commands:
   chooseClass:
     description: "Opens a GUI that let's the player choose their class."

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class OpenSelectClassGUICommand: CommandExecutor {
+
     override fun onCommand(sender: CommandSender, p1: Command, p2: String, args: Array<out String>): Boolean {
 
         if (sender !is Player) return false
@@ -79,12 +80,23 @@ class OpenSelectClassGUICommand: CommandExecutor {
 
         witherClassButton.itemMeta = witherClassButtonMeta
 
+        //close
+        val closeButton = ItemStack(Material.BARRIER)
+        val closeButtonMeta = closeButton.itemMeta
+
+        witherClassButtonMeta
+            .displayName(Component.text("Close")
+                .color(TextColor.color(255, 0, 0)))
+
+        closeButton.itemMeta = closeButtonMeta
+
         inventory.setItem(0, netherClassButton)
-        inventory.setItem(2, oceanClassButton)
-        inventory.setItem(3, witherClassButton)
-        inventory.setItem(4, overworldClassButton)
-        inventory.setItem(6, skyClassButton)
-        inventory.setItem(8, endClassButton)
+        inventory.setItem(1, oceanClassButton)
+        inventory.setItem(2, witherClassButton)
+        inventory.setItem(3, overworldClassButton)
+        inventory.setItem(4, skyClassButton)
+        inventory.setItem(5, endClassButton)
+        inventory.setItem(8, closeButton)
 
         NaturePowers.selectClassGUIMap[sender.uniqueId] = inventory
 

@@ -36,8 +36,6 @@ class NaturePowers : JavaPlugin() {
         registerListener()
         registerCommands()
 
-
-
     }
 
     @EventHandler
@@ -57,7 +55,7 @@ class NaturePowers : JavaPlugin() {
 
         server.pluginManager.registerEvents(InventoryCloseListener(), this)
 
-        server.pluginManager.registerEvents(SpecialSkillListener(), this)
+        server.pluginManager.registerEvents(CommandBlockerListener(), this)
 
         //server.pluginManager.registerEvents(DebugShootListener(this), this)
 
@@ -80,6 +78,15 @@ class NaturePowers : JavaPlugin() {
     override fun onDisable() {
         // Plugin shutdown logic
         logger.info("Shutting down...")
+
+        logger.severe("=== playerData.yml CONTENT ===")
+
+        manager.debugLogAllPlayerClasses()
+
+        manager.cleanPlayerData()
+
+        manager.debugLogAllPlayerClasses()
+
     }
 
 
