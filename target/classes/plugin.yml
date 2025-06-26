@@ -1,5 +1,5 @@
 name: NaturePowers
-version: '2.0-SNAPSHOT'
+version: '1.0'
 main: me.ivan.naturePowers.NaturePowers
 api-version: '1.21.4'
 commands:
