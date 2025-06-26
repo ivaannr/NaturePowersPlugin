@@ -32,7 +32,7 @@
 
 ## 🚀 How to use
 
-Very simple, just type the /chooseclass command and select the class of your choice.
+- Very simple, just type the /chooseclass command and select the class of your choice.
 
 ---
 
