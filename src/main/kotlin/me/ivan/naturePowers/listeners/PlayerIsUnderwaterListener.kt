@@ -8,12 +8,11 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.util.Vector
 import kotlin.random.Random
 
 class PlayerIsUnderwaterListener: Listener {
 
-    private val rd = Random
+    private val rd = Random.Default
 
     @EventHandler
     fun oceanClassTakesDamageUnderwater(event: EntityDamageEvent) {
@@ -47,28 +46,5 @@ class PlayerIsUnderwaterListener: Listener {
         }
     }
 
-    fun endClassTouchsWater(event: PlayerMoveEvent) {
-
-        val player = event.player
-
-        if (NaturePowers.manager.getPlayerClass(player.uniqueId.toString()) != "ocean") return
-
-        val block = player.location.block
-        val isInWater = block.type.name.contains("WATER")
-
-        if (isInWater) {
-            player.damage(2.0)
-
-            val randomTPLocation = player.location
-
-            val groundY = randomTPLocation.world.getHighestBlockYAt(randomTPLocation)
-
-            randomTPLocation.y = (groundY + 1).toDouble()
-            randomTPLocation.x += rd.nextInt(-15, 16)
-            randomTPLocation.z += rd.nextInt(-15, 16)
-
-            player.teleport(randomTPLocation)
-        }
-    }
 
 }

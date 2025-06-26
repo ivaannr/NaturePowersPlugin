@@ -18,6 +18,8 @@ class NaturePowers : JavaPlugin() {
             private set
 
         lateinit var manager: Manager
+
+        lateinit var statsManager: StatsManager
         
         val selectClassGUIMap: MutableMap<UUID, Inventory> = mutableMapOf()
     }
@@ -25,16 +27,17 @@ class NaturePowers : JavaPlugin() {
     override fun onEnable() {
         // Plugin startup logic
 
-        logger.info("Starting Nature Powers...")
-
         instance = this
         manager = Manager(this)
         manager.loadClasses()
+        statsManager = StatsManager(this)
 
         UnderWaterBreathingTask().runTaskTimer(this, 0L, 20L)
 
         registerListener()
         registerCommands()
+
+        logger.info("Starting Nature Powers...")
 
     }
 
@@ -47,15 +50,19 @@ class NaturePowers : JavaPlugin() {
 
         server.pluginManager.registerEvents(PlayerIsUnderwaterListener(), this)
 
-        server.pluginManager.registerEvents(PlayerSetUpOnJoinListener(), this)
+        server.pluginManager.registerEvents(PlayerSetUpOnJoinListener(this), this)
 
         server.pluginManager.registerEvents(SpecialSkillListener(), this)
 
-        server.pluginManager.registerEvents(InventoryClickListener(), this)
+        server.pluginManager.registerEvents(InventoryClickListener(this), this)
 
         server.pluginManager.registerEvents(InventoryCloseListener(), this)
 
         server.pluginManager.registerEvents(CommandBlockerListener(), this)
+
+        server.pluginManager.registerEvents(PlayerRespawnListener(), this)
+
+        server.pluginManager.registerEvents(PlayerIsDamagedListener(), this)
 
         //server.pluginManager.registerEvents(DebugShootListener(this), this)
 
@@ -78,15 +85,6 @@ class NaturePowers : JavaPlugin() {
     override fun onDisable() {
         // Plugin shutdown logic
         logger.info("Shutting down...")
-
-        logger.severe("=== playerData.yml CONTENT ===")
-
-        manager.debugLogAllPlayerClasses()
-
-        manager.cleanPlayerData()
-
-        manager.debugLogAllPlayerClasses()
-
     }
 
 

@@ -8,8 +8,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.plugin.java.JavaPlugin
 
-class InventoryClickListener: Listener {
+class InventoryClickListener(private val plugin: JavaPlugin): Listener {
 
     @EventHandler
     fun inventoryClassSelectorClickEvent(event: InventoryClickEvent) {
@@ -31,7 +32,15 @@ class InventoryClickListener: Listener {
                 else -> return
             }
 
+            if (playerClass == "close") {
+                player.closeInventory()
+                event.isCancelled = true
+                return
+            }
+
             NaturePowers.manager.setPlayerClass(playerUUID.toString(), playerClass)
+
+            NaturePowers.statsManager.setPlayerStats(player)
 
             player.sendMessage(
                 Component
@@ -39,9 +48,13 @@ class InventoryClickListener: Listener {
                     .color(TextColor.color(0, 255, 0))
             )
 
-            event.inventory.close()
+            player.closeInventory()
             event.isCancelled = true
         }
     }
+
+
+
+
 
 }
